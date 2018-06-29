@@ -37,44 +37,48 @@ object Baraja {
    */
   var mazoActualizado = Random.shuffle(mazo)
 
-  /**
-   * Este metodo es el encargado de repartir las cartas del mazo. En la mano inicial repartira 4
-   * cartas siempre, pero en las siguientes repartira un numero "n" dependiendo de los descartes.
-   * Hay que tener en cuenta que el mazo puede llegar a acabarse, en cuyo caso, y si es
-   * necesario, el mazoActualizado una vez acabado, se recargará con los descartes de los muses
-   *
-   * Pista: El metodo "take" de las colecciones puede ser de ayuda. Mirar tambien los metodos que
-   * permiten añadir elementos a una coleccion dejandolo en otra coleccion.
-   *
-   * @param numero Numero de cartas a repartir
-   * @return Seq[[Carta]]
-   */
-  def repartirCartas(numero: Int): Seq[Carta] = ???
 
   /**
-   * Este método nos sirve para dejar actualizado el mazoActualizado, que sera el actual menos
-   * las repartidas.
-   * Pista: Mirar los metodos que permiten añadir, quitar, etc de una colección
-   *
-   * @param repartidas Seq[[Carta]] de las cartas repartidas y que hay que quitar del
-   *                   mazoActualizado
-   */
-  private def actualizaMazo(repartidas: Seq[Carta]): Unit = ???
-
+    * Este metodo es el encargado de repartir las cartas del mazo. En la mano inicial repartira 4
+    * cartas siempre, pero en las siguientes repartira un numero "n" dependiendo de los descartes.
+    * Hay que tener en cuenta que el mazo puede llegar a acabarse, en cuyo caso, y si es
+    * necesario, el mazoActualizado una vez acabado, se recargará con los descartes de los muses
+    *
+    * Pista: El metodo "take" de las colecciones puede ser de ayuda. Mirar tambien los metodos que
+    * permiten añadir elementos a una coleccion dejandolo en otra coleccion.
+    *
+    * @param numero Numero de cartas a repartir
+    * @return Seq[[Carta]]
+    */
+  def repartirCartas(numero: Int): Seq[Carta] = {
+    var (mano,nuevoMazo) = mazoActualizado.splitAt(numero)
+    mazoActualizado = nuevoMazo
+    if(mano.size<numero){
+      volcarDescartesEnMazo
+      mano ++= repartirCartas(numero-mano.size)
+    }
+    mano
+  }
 
   /**
    * Este metodo deja el mazoActualizado con todas las cartas de mazo. Se utilizara solo cuando
    * acaba una partida. Recordad dejar descartes a cero. Actualmente se utiliza en test para
    * dejar la baraja limpia en cada test.
    */
-  def reiniciaMazo: Unit = ???
+  def reiniciaMazo: Unit = {
+    descartes = Seq[Carta]()
+    mazoActualizado = Random.shuffle(mazo)
+  }
 
   /**
    * Este metodo se utilizará cuando se acaben las cartas del mazoActualizado. En ese momento, se
    * pondran en el mazoActualizado los descartes de los muses que haya habido. Tener en cuenta
    * que los descartes despues de esta acción no existiran
    */
-  def volcarDescartesEnMazo: Unit = ???
+  def volcarDescartesEnMazo: Unit = {
+    mazoActualizado = Random.shuffle(descartes)
+    descartes = Seq[Carta]()
+  }
 
   /**
    * Con este metodo podremos añadir los descartes de cada mus dado a la variable de descartes.
@@ -84,14 +88,14 @@ object Baraja {
    *
    * @param descarte Seq[[Carta]] a insertar en la variable descartes.
    */
-  def descartar(descarte: Seq[Carta]): Unit = ???
+  def descartar(descarte: Seq[Carta]): Unit = descartes ++= descarte
 
   /**
    * Este metodo nos informara del numero de cartas que quedan en el mazoActualizado
    *
    * @return [[Int]] con el numero de cartas del mazoActualizado
    */
-  def cuantasQuedan: Int = ???
+  def cuantasQuedan: Int = mazoActualizado size
 
   /**
    * Metodo que mete en un String las cartas que quedan en el mazoActualizado

@@ -12,12 +12,24 @@ class Jugada(val cartas: Seq[Carta]) {
    * controlar el mazo. Este método devolverá una nueva jugada con las cartas mantenidas, y las
    * nuevas cartas despues del descarte
    * Pista: Ver como funciona el metodo ZIP en las colecciones
-   * @param descarte Seq[[Int]] con valores de 1 a 4 que se corresponderá con el orden de las
+    *
+    * @param descarte Seq[[Int]] con valores de 1 a 4 que se corresponderá con el orden de las
    *                 cartas mostradas
    * @return La nueva [[Jugada]]
    */
-  def mus(descarte: Seq[Int]): Jugada = ???
-
+  def mus(descarte: Seq[Int]): Jugada = {
+    val cartasOrdenadas = cartas.zipWithIndex
+    var nuevaMano = Seq[Carta]()
+    cartasOrdenadas.foreach{case (x,i)=>{
+      if(descarte.contains(i+1)) {
+        Baraja.descartar(Seq(x))
+      }else{
+        nuevaMano ++= Seq(x)
+      }
+    }}
+    nuevaMano ++= Baraja.repartirCartas(4-nuevaMano.size)
+    new Jugada(nuevaMano)
+  }
 
   /**
    * Vuelca en una variable las cartas de la jugada. Cada carta tiene que expresarse de la
@@ -28,11 +40,12 @@ class Jugada(val cartas: Seq[Carta]) {
    */
   override def toString: String = {
 
-    val cartasString = ???
+    val cartasString = cartas.zipWithIndex map{case (x,i)=>s"[${i+1}] ${x.valor} de ${x.palo}\n" }
+
 
     s"""Cartas del jugador:
        |********************
-       |$cartasString
+       |${cartasString mkString}
        |""".stripMargin
   }
 }
